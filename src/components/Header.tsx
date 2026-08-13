@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Brand Title */}
         <div className="flex items-center space-x-3">
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 shadow-lg shadow-indigo-500/30">
+          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-500 shadow-lg shadow-indigo-500/30">
             <Mic className="w-5 h-5 text-white animate-pulse" />
           </div>
           <div>
@@ -31,11 +31,11 @@ export const Header: React.FC<HeaderProps> = ({
                 Voice RAG System
               </h1>
               <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 flex items-center gap-1">
-                <Zap className="w-3 h-3 text-amber-400" /> &lt;200ms Target
+                <Zap className="w-3 h-3 text-amber-400" /> Sub-200ms Engine
               </span>
             </div>
             <p className="text-xs text-gray-400">
-              MSMARCO-XI Dataset • Multi-Strategy Chunking • Harness Guardrails
+              ai4bharat/MSMARCO-XI Dataset • Multi-Chunking • Latency Analytics
             </p>
           </div>
         </div>
@@ -44,11 +44,12 @@ export const Header: React.FC<HeaderProps> = ({
         <nav className="flex items-center p-1 rounded-xl bg-dark-800/80 border border-gray-800 text-sm">
           <button
             onClick={() => setActiveTab('rag')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
+            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
               activeTab === 'rag'
                 ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-600/30 font-medium'
                 : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
             }`}
+            title="Voice RAG Studio — Speak or ask questions"
           >
             <Mic className="w-4 h-4" />
             <span>Voice RAG Studio</span>
@@ -56,11 +57,12 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => setActiveTab('chunking')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
+            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
               activeTab === 'chunking'
                 ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-600/30 font-medium'
                 : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
             }`}
+            title="Chunking Workbench — Compare splitting algorithms"
           >
             <Layers className="w-4 h-4" />
             <span>Chunking Workbench</span>
@@ -68,26 +70,28 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => setActiveTab('harness')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
+            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
               activeTab === 'harness'
                 ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-600/30 font-medium'
                 : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
             }`}
+            title="Harness & Guardrails — Test safety refusal rules"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Harness & Guardrails</span>
+            <span>Guardrails</span>
           </button>
 
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
+            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg transition-all text-xs md:text-sm ${
               activeTab === 'analytics'
                 ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-600/30 font-medium'
                 : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
             }`}
+            title="Latency Analytics — P50 / P70 / P100 benchmark charts"
           >
             <BarChart3 className="w-4 h-4" />
-            <span>Latency Analytics</span>
+            <span>P50/P100 Analytics</span>
           </button>
         </nav>
 
@@ -95,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center space-x-3">
           <div className="hidden lg:flex items-center space-x-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>{datasetCount} Passages Indexed</span>
+            <span>{datasetCount} Passages Ready</span>
           </div>
 
           <div className="text-xs px-2.5 py-1 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-200 uppercase font-mono tracking-wider">
@@ -105,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenSettings}
             className="p-2 rounded-lg bg-dark-800 hover:bg-indigo-600/20 border border-gray-700 hover:border-indigo-500/40 text-gray-300 hover:text-white transition"
-            title="Configure STT API Keys & Settings"
+            title="Configure ElevenLabs / Sarvam STT API Keys"
           >
             <Settings className="w-4 h-4" />
           </button>
