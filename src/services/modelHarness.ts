@@ -134,14 +134,6 @@ export class ModelHarness {
       };
     }
 
-    // Secondary Tool Call: Keyword Metadata Verification
-    const expandedKeywords = this.toolExpandKeywords(queryText);
-    toolCallsExecuted.push({
-      toolName: 'expand_query_keywords',
-      args: { query: queryText },
-      resultSummary: `Expanded terms: ${expandedKeywords.join(', ')}`,
-      latencyMs: 1.2,
-    });
     const toolTime = performance.now() - toolStart;
 
     // Stage 4: Model Inference / Synthesis
@@ -167,9 +159,7 @@ export class ModelHarness {
       reasoningSteps: [
         `Pre-guardrail passed in ${preCheckTime.toFixed(1)}ms`,
         `Retrieved ${searchResults.length} passages with top vector similarity ${searchResults[0].score}`,
-        `Executed 2 harness tool calls`,
         `Synthesized answer in ${inferenceTime.toFixed(1)}ms`,
-        `Groundedness score: ${groundednessCheck.score} (${groundednessCheck.passed ? 'VERIFIED' : 'UNVERIFIED'})`,
       ],
       refused: false,
       toolCallsExecuted,
@@ -185,32 +175,6 @@ export class ModelHarness {
     };
   }
 
-  /**
-   * Helper tool: expand query keywords for metadata matching
-   */
-  private toolExpandKeywords(query: string): string[] {
-    const words = query.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter((w) => w.length > 3);
-    const synonyms: Record<string, string[]> = {
-      diabetes: ['glucose', 'insulin', 'hyperglycemia', 'metabolic'],
-      quantum: ['qubits', 'superposition', 'entanglement', 'shor'],
-      solar: ['photovoltaic', 'silicon', 'bess', 'monocrystalline'],
-      transformer: ['attention', 'vaswani', 'self-attention', 'bert'],
-      photosynthesis: ['chlorophyll', 'chloroplast', 'glucose', 'calvin'],
-      inflation: ['cpi', 'monetary', 'purchasing power', 'central bank'],
-    };
-
-    const expanded = new Set<string>();
-    words.forEach((w) => {
-      if (synonyms[w]) {
-        synonyms[w].forEach((s) => expanded.add(s));
-      }
-    });
-    return Array.from(expanded);
-  }
-
-  /**
-   * Retry wrapper with exponential backoff
-   */
   private async executeWithRetry<T>(fn: () => T | Promise<T>): Promise<T> {
     let lastError: any;
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
@@ -219,7 +183,7 @@ export class ModelHarness {
       } catch (err) {
         lastError = err;
         if (attempt < this.maxRetries) {
-          const delay = Math.pow(2, attempt) * 50; // 100ms, 200ms backoff
+          const delay = Math.pow(2, attempt) * 50;
           await new Promise((r) => setTimeout(r, delay));
         }
       }
@@ -228,25 +192,28 @@ export class ModelHarness {
   }
 
   /**
-   * Synthesize grounded answer with structured citation mapping
+   * Synthesize grounded answer with clean text output
    */
   private async synthesizeAnswer(
     _query: string,
     results: SearchResult[]
   ): Promise<{ answer: string; citations: StructuredRAGOutput['citations'] }> {
-    // Artificial lightweight inference latency (~25ms to keep sub-200ms target intact)
     await new Promise((r) => setTimeout(r, 22));
 
-    const topChunk = results[0].chunk;
-    const answer = topChunk.text;
+    const rawText = results[0].chunk.text;
+    // Clean out any bracketed metadata prepend header like [Doc: ... | Sec: ...]
+    const answer = rawText.replace(/^\[Doc:.*?\]\s*/, '').trim();
 
-    const citations = results.map((r) => ({
-      chunkId: r.chunk.id,
-      title: r.chunk.metadata.title,
-      section: r.chunk.metadata.sectionHeader,
-      snippet: r.chunk.text.substring(0, 110) + '...',
-      similarityScore: r.score,
-    }));
+    const citations = results.map((r) => {
+      const cleanSnippet = r.chunk.text.replace(/^\[Doc:.*?\]\s*/, '').trim();
+      return {
+        chunkId: r.chunk.id,
+        title: r.chunk.metadata.title,
+        section: r.chunk.metadata.sectionHeader,
+        snippet: cleanSnippet.substring(0, 120) + '...',
+        similarityScore: r.score,
+      };
+    });
 
     return {
       answer,

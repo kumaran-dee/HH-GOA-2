@@ -16,7 +16,7 @@ export function App() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Vector DB engine indexed with MSMARCO-XI dataset chunks
+  // Vector DB Engine
   const vectorDb = useMemo(() => {
     const engine = new VectorDbEngine();
     const allChunks: Chunk[] = [];
@@ -32,7 +32,7 @@ export function App() {
 
   const harness = useMemo(() => new ModelHarness(vectorDb), [vectorDb]);
 
-  // Initial clean welcome message
+  // Initial welcome message from assistant
   useEffect(() => {
     setMessages([
       {
@@ -53,6 +53,7 @@ export function App() {
     ]);
   }, []);
 
+  // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
@@ -154,34 +155,31 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-dark-950 text-gray-100 selection:bg-cyan-500/30">
-      {/* Clean Top Bar */}
+    <div className="h-screen flex flex-col font-sans bg-dark-950 text-gray-100 selection:bg-cyan-500/30 overflow-hidden">
+      {/* 1. Fixed Header at Top */}
       <ChatHeader
         onClearChat={handleClearChat}
         messageCount={messages.length}
       />
 
-      {/* Main Clean Workspace */}
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-4 flex flex-col justify-start space-y-6">
-        {/* BIG CENTERED VOICE MIC */}
-        <HeroVoiceMic onSendMessage={handleSendMessage} isLoading={isLoading} />
-
-        {/* Conversation List */}
-        <div className="w-full space-y-3 pt-4 border-t border-white/5">
-          <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
-            {messages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                message={msg}
-                currentlySpeakingId={currentlySpeakingId}
-                onStartSpeak={handleStartSpeak}
-                onStopSpeak={handleStopSpeak}
-              />
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
+      {/* 2. Middle Scrollable Chat Messages Feed (Starts at Top) */}
+      <main className="flex-1 overflow-y-auto w-full max-w-3xl mx-auto px-4 py-6 space-y-4">
+        {messages.map((msg) => (
+          <ChatMessage
+            key={msg.id}
+            message={msg}
+            currentlySpeakingId={currentlySpeakingId}
+            onStartSpeak={handleStartSpeak}
+            onStopSpeak={handleStopSpeak}
+          />
+        ))}
+        <div ref={messagesEndRef} />
       </main>
+
+      {/* 3. Fixed Chatbot Bottom Dock (Prompt Box + Mic Button) */}
+      <footer className="w-full bg-dark-950/90 backdrop-blur-md border-t border-white/10 py-3">
+        <HeroVoiceMic onSendMessage={handleSendMessage} isLoading={isLoading} />
+      </footer>
     </div>
   );
 }

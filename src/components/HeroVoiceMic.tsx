@@ -88,90 +88,71 @@ export const HeroVoiceMic: React.FC<HeroVoiceMicProps> = ({
   }, []);
 
   return (
-    <div className="w-full max-w-xl mx-auto flex flex-col items-center my-6 space-y-6 text-center">
-      {/* Title */}
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-200">
-        {isRecording ? 'Listening...' : 'Ask a Question with Voice or Text'}
-      </h2>
-
-      {/* BIG CENTERED MIC BUTTON */}
-      <div className="relative flex items-center justify-center">
-        {/* Soft Pulse when recording */}
-        {isRecording && (
-          <>
-            <span className="absolute w-36 h-36 rounded-full bg-cyan-500/20 animate-ping"></span>
-            <span className="absolute w-48 h-48 rounded-full bg-cyan-500/10 animate-pulse"></span>
-          </>
-        )}
-
-        <button
-          onClick={handleToggleVoice}
-          disabled={isLoading}
-          className={`relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-xl ${
-            isRecording
-              ? 'bg-gradient-to-tr from-rose-500 to-pink-600 text-white shadow-rose-500/40 animate-pulse'
-              : 'bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-500 text-white shadow-cyan-500/30'
-          }`}
-          title={isRecording ? 'Stop Recording' : 'Click to Speak'}
-        >
-          {isRecording ? (
-            <MicOff className="w-9 h-9" />
-          ) : (
-            <Mic className="w-9 h-9" />
-          )}
-          <span className="mt-1 text-[10px] font-semibold tracking-wide uppercase opacity-90">
-            {isRecording ? `${recordingSeconds}s Stop` : 'Voice'}
-          </span>
-        </button>
-      </div>
-
-      {/* Interim Speech Preview */}
-      {isRecording && (
-        <div className="text-xs text-cyan-300 italic font-mono animate-pulse">
-          "{voiceInterimText || 'Listening to your speech...'}"
-        </div>
-      )}
-
-      {/* Clean Input Box */}
-      <form onSubmit={handleSubmit} className="w-full">
-        <div className="relative glass-panel rounded-2xl border border-white/10 focus-within:border-cyan-500/50 shadow-lg overflow-hidden flex items-center">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Type your question here..."
-            disabled={isLoading}
-            className="w-full py-3 pl-4 pr-12 bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none"
-          />
-
-          <button
-            type="submit"
-            disabled={!inputText.trim() || isLoading}
-            className={`absolute right-2 p-2 rounded-xl transition ${
-              !inputText.trim() || isLoading
-                ? 'text-gray-600 cursor-not-allowed'
-                : 'text-cyan-400 hover:text-cyan-200'
-            }`}
-            title="Send"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </div>
-      </form>
-
-      {/* Simple Sample Questions */}
-      <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-        {SAMPLE_QUERIES.slice(0, 4).map((sample) => (
+    <div className="w-full max-w-2xl mx-auto px-4 py-2 space-y-2">
+      {/* Sample Question Chips Bar */}
+      <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
+        {SAMPLE_QUERIES.slice(0, 5).map((sample) => (
           <button
             key={sample.id}
             onClick={() => handleSelectSample(sample)}
             disabled={isLoading}
-            className="px-3 py-1 rounded-full text-xs bg-white/5 hover:bg-cyan-500/10 text-gray-300 hover:text-cyan-300 border border-white/5 hover:border-cyan-500/30 transition"
+            className="shrink-0 px-3 py-1 rounded-full text-xs bg-white/5 hover:bg-cyan-500/10 text-gray-300 hover:text-cyan-300 border border-white/5 hover:border-cyan-500/30 transition"
           >
             {sample.query}
           </button>
         ))}
       </div>
+
+      {/* Interim Voice Preview */}
+      {isRecording && (
+        <div className="text-xs text-center text-cyan-300 font-mono italic animate-pulse py-1">
+          🎙️ "{voiceInterimText || `Listening (${recordingSeconds}s)...`}"
+        </div>
+      )}
+
+      {/* Chatbot Prompt Bar with Embedded Big Mic */}
+      <form onSubmit={handleSubmit} className="relative flex items-center">
+        <div className="relative w-full glass-panel rounded-2xl border border-white/10 focus-within:border-cyan-500/50 shadow-2xl flex items-center p-1.5 space-x-2">
+          {/* Big Voice Mic Orb Button */}
+          <button
+            type="button"
+            onClick={handleToggleVoice}
+            disabled={isLoading}
+            className={`relative shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 shadow-md ${
+              isRecording
+                ? 'bg-rose-500 text-white animate-pulse shadow-rose-500/50'
+                : 'bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-500 text-white shadow-cyan-500/30 hover:scale-105'
+            }`}
+            title={isRecording ? 'Stop Recording' : 'Speak Question'}
+          >
+            {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+          </button>
+
+          {/* Text Input Field */}
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Ask a question or speak..."
+            disabled={isLoading}
+            className="flex-1 py-2 px-2 bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none"
+          />
+
+          {/* Send Button */}
+          <button
+            type="submit"
+            disabled={!inputText.trim() || isLoading}
+            className={`p-2.5 rounded-xl transition ${
+              !inputText.trim() || isLoading
+                ? 'text-gray-600 cursor-not-allowed'
+                : 'bg-cyan-500 hover:bg-cyan-400 text-dark-950 font-bold shadow-md shadow-cyan-500/20'
+            }`}
+            title="Send Message"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
