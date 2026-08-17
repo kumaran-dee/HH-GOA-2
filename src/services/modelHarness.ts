@@ -53,6 +53,35 @@ export class ModelHarness {
   }
 
   /**
+   * Check for natural conversational intents (Greetings, Farewells, Gratitude, Identity)
+   */
+  private checkConversationalIntent(query: string): string | null {
+    const q = query.toLowerCase().trim().replace(/[^\w\s]/g, '');
+
+    // Greetings
+    if (/^(hi|hello|hey|hey there|greetings|namaste|good morning|good afternoon|good evening)$/.test(q)) {
+      return "Hello! How can I help you today? Feel free to ask any question about Artificial Intelligence, Quantum Computing, Healthcare, Clean Energy, Economics, or Indic NLP.";
+    }
+
+    // Farewells
+    if (/^(exit|bye|goodbye|see ya|quit|close|cya|bye bye)$/.test(q)) {
+      return "Goodbye! Have a wonderful day ahead. Feel free to come back whenever you have questions.";
+    }
+
+    // Gratitude
+    if (/^(thanks|thank you|thx|thank u|appreciate it|great thanks)$/.test(q)) {
+      return "You're very welcome! Let me know if you have any other questions.";
+    }
+
+    // Identity / Capabilities
+    if (/^(who are you|what can you do|what is this|help|info|capabilities|who made you)$/.test(q)) {
+      return "I am the HH-GOA Voice RAG Assistant grounded on the AI4Bharat MSMARCO-XI dataset. You can speak using the Big Voice button or type any question to get verifiable answers with dataset citations!";
+    }
+
+    return null;
+  }
+
+  /**
    * Execute End-to-End RAG Harness Orchestration
    */
   public async executePipeline(
@@ -89,6 +118,30 @@ export class ModelHarness {
           modelInference: 0,
           postGuardrail: 0,
           totalPipeline: Number(totalTime.toFixed(2)),
+        },
+      };
+    }
+
+    // Stage 1.5: Conversational Intent Handler (Greetings, Exit, Gratitude)
+    const conversationalResponse = this.checkConversationalIntent(queryText);
+    if (conversationalResponse) {
+      const totalPipelineTime = Number((performance.now() - totalStartTime).toFixed(2));
+      onStateChange?.('COMPLETE', 'Conversational response generated');
+      return {
+        answer: conversationalResponse,
+        confidence: 1.0,
+        citations: [],
+        reasoningSteps: ['Recognized natural conversational intent'],
+        refused: false,
+        toolCallsExecuted: [],
+        stageTimingsMs: {
+          stt: sttLatencyMs,
+          preGuardrail: Number(preCheckTime.toFixed(2)),
+          vectorRetrieval: 0,
+          toolOrchestration: 0,
+          modelInference: 5,
+          postGuardrail: 0,
+          totalPipeline: totalPipelineTime,
         },
       };
     }
