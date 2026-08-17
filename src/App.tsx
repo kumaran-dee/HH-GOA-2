@@ -9,6 +9,8 @@ import { VectorDbEngine } from './services/vectorDb';
 import { ModelHarness } from './services/modelHarness';
 import { TextToSpeechService } from './services/ttsService';
 
+import { Bot } from 'lucide-react';
+
 export function App() {
   const [messages, setMessages] = useState<ChatMessageItem[]>([]);
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
@@ -31,27 +33,6 @@ export function App() {
   }, []);
 
   const harness = useMemo(() => new ModelHarness(vectorDb), [vectorDb]);
-
-  // Initial welcome message from assistant
-  useEffect(() => {
-    setMessages([
-      {
-        id: 'welcome-1',
-        sender: 'bot',
-        text: `Hello! Ask any question about AI, Quantum Computing, Health, or Energy using your Voice or Text.`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        ragOutput: {
-          answer: `Hello! Ask any question about AI, Quantum Computing, Health, or Energy using your Voice or Text.`,
-          confidence: 1.0,
-          citations: [],
-          reasoningSteps: [],
-          refused: false,
-          toolCallsExecuted: [],
-          stageTimingsMs: { stt: 0, preGuardrail: 0, vectorRetrieval: 0, toolOrchestration: 0, modelInference: 0, postGuardrail: 0, totalPipeline: 0 },
-        },
-      },
-    ]);
-  }, []);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -156,27 +137,43 @@ export function App() {
 
   return (
     <div className="h-screen flex flex-col font-sans bg-dark-950 text-gray-100 selection:bg-cyan-500/30 overflow-hidden">
-      {/* 1. Fixed Header at Top */}
+      {/* Fixed Header */}
       <ChatHeader
         onClearChat={handleClearChat}
         messageCount={messages.length}
       />
 
-      {/* 2. Middle Scrollable Chat Messages Feed (Starts at Top) */}
-      <main className="flex-1 overflow-y-auto w-full max-w-3xl mx-auto px-4 py-6 space-y-4">
-        {messages.map((msg) => (
-          <ChatMessage
-            key={msg.id}
-            message={msg}
-            currentlySpeakingId={currentlySpeakingId}
-            onStartSpeak={handleStartSpeak}
-            onStopSpeak={handleStopSpeak}
-          />
-        ))}
-        <div ref={messagesEndRef} />
+      {/* Middle Chat Feed (ChatGPT / Gemini Empty State initially) */}
+      <main className="flex-1 overflow-y-auto w-full max-w-3xl mx-auto px-4 py-6 flex flex-col justify-between">
+        {messages.length === 0 ? (
+          <div className="my-auto flex flex-col items-center justify-center text-center space-y-4 animate-slide-up py-12">
+            <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-400 flex items-center justify-center text-white shadow-2xl shadow-cyan-500/30 animate-pulse-glow">
+              <Bot className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-extrabold text-white tracking-tight">
+              What can I answer for you today?
+            </h2>
+            <p className="text-xs text-gray-400 max-w-sm leading-relaxed">
+              Grounded on AI4Bharat MSMARCO-XI dataset. Tap the Big Voice button or type below to begin.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4 w-full">
+            {messages.map((msg) => (
+              <ChatMessage
+                key={msg.id}
+                message={msg}
+                currentlySpeakingId={currentlySpeakingId}
+                onStartSpeak={handleStartSpeak}
+                onStopSpeak={handleStopSpeak}
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </main>
 
-      {/* 3. Fixed Chatbot Bottom Dock (Prompt Box + Mic Button) */}
+      {/* Fixed Chatbot Bottom Dock */}
       <footer className="w-full bg-dark-950/90 backdrop-blur-md border-t border-white/10 py-3">
         <HeroVoiceMic onSendMessage={handleSendMessage} isLoading={isLoading} />
       </footer>
