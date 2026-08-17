@@ -16,7 +16,86 @@ export interface STTConfig {
   language?: string;
 }
 
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
 export class SpeechToTextService {
+  private static activeRecognition: any = null;
+
+  /**
+   * Start live browser Web Speech Recognition
+   */
+  public static startBrowserListening(
+    onInterim: (text: string) => void,
+    onFinal: (text: string) => void,
+    onError: (err: string) => void
+  ): boolean {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      return false;
+    }
+
+    try {
+      this.stopListening();
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+
+        if (interimTranscript) {
+          onInterim(interimTranscript);
+        }
+
+        if (finalTranscript) {
+          onFinal(finalTranscript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        onError(event.error || 'Speech recognition error');
+      };
+
+      recognition.start();
+      this.activeRecognition = recognition;
+      return true;
+    } catch (err: any) {
+      onError(err.message || 'Failed to start speech recognition');
+      return false;
+    }
+  }
+
+  /**
+   * Stop active browser speech recognition
+   */
+  public static stopListening(): void {
+    if (this.activeRecognition) {
+      try {
+        this.activeRecognition.stop();
+      } catch (_e) {
+        // ignore
+      }
+      this.activeRecognition = null;
+    }
+  }
+
   /**
    * Transcribe an audio Blob using the selected provider
    */
@@ -125,7 +204,6 @@ export class SpeechToTextService {
     _audioBlob: Blob,
     startTime: number
   ): Promise<STTResponse> {
-    // Artificial small delay representing fast local transcription
     await new Promise((r) => setTimeout(r, 45));
 
     const sampleTranscripts = [
@@ -137,7 +215,6 @@ export class SpeechToTextService {
       "What causes inflation and how do central banks control it?"
     ];
 
-    // Pick deterministic or random transcript based on size
     const idx = Math.floor(Math.random() * sampleTranscripts.length);
     const text = sampleTranscripts[idx];
     const endTime = performance.now();
@@ -182,7 +259,6 @@ export class AudioRecorder {
 
       this.mediaRecorder.onstop = () => {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-        // Stop all tracks
         this.mediaRecorder?.stream.getTracks().forEach((track) => track.stop());
         resolve(audioBlob);
       };

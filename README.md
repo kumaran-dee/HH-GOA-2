@@ -1,32 +1,36 @@
-# React + TypeScript + Vite
+# MSMARCO-XI Voice RAG Chatbot UI/UX
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A modern, high-performance Retrieval-Augmented Generation (RAG) Chatbot grounded on the [AI4Bharat MSMARCO-XI](https://huggingface.co/datasets/ai4bharat/MSMARCO-XI) dataset with built-in **Voice Input (Speech-to-Text)** and **Voice Output (Text-to-Speech)** capabilities.
 
-Currently, two official plugins are available:
+## 🚀 Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Grounded Conversational RAG**: Answers user questions using vector similarity retrieval over AI4Bharat MSMARCO-XI passages (covering Artificial Intelligence, Quantum Computing, Healthcare, Clean Energy, Economics, and Indic NLP IR).
+- **🎙️ Voice Input Support**: Speak queries directly using browser Web Speech API with real-time listening indicators and transcription fallback.
+- **🔊 Voice Output (TTS)**: Listen to synthesized chatbot responses with interactive sound wave visualizers.
+- **📚 Verified Dataset Citations**: Expandable citation cards displaying exact source passages, section titles, and similarity scores.
+- **🛡️ Guardrails & Safety**: Pre-execution and context relevance checks that refuse off-topic questions while offering dataset suggestions.
+- **🔍 Dataset Index Drawer**: Slide-over drawer to search, filter by domain/language, and inspect all indexed MSMARCO-XI passages.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 19, TypeScript, Vite
+- **Styling**: TailwindCSS, Vanilla CSS glassmorphism
+- **Icons**: Lucide React
+- **Retrieval Engine**: TF-IDF + Cosine Similarity Vector Database
+- **Dataset**: AI4Bharat MSMARCO-XI (`ai4bharat/MSMARCO-XI`)
 
-## Expanding the Oxlint configuration
+## 💻 Local Development
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+```bash
+# Install dependencies
+npm install
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Start local dev server
+npm run dev
+
+# Production Build
+npm run build
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+Repository: [https://github.com/kumaran-dee/HH-GOA-2.git](https://github.com/kumaran-dee/HH-GOA-2.git)
