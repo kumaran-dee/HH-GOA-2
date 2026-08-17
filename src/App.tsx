@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChatHeader } from './components/ChatHeader';
+import { HeroVoiceMic } from './components/HeroVoiceMic';
 import { ChatMessage, type ChatMessageItem } from './components/ChatMessage';
-import { VoiceChatInput } from './components/VoiceChatInput';
 import { DatasetInspectorDrawer } from './components/DatasetInspectorDrawer';
 
 import { INITIAL_MSMARCO_DATASET } from './services/msmarcoDataset';
@@ -9,8 +9,6 @@ import { ChunkingEngine, type Chunk } from './services/chunkingEngine';
 import { VectorDbEngine } from './services/vectorDb';
 import { ModelHarness } from './services/modelHarness';
 import { TextToSpeechService } from './services/ttsService';
-
-import { Bot } from 'lucide-react';
 
 export function App() {
   const [messages, setMessages] = useState<ChatMessageItem[]>([]);
@@ -43,10 +41,10 @@ export function App() {
       {
         id: 'welcome-1',
         sender: 'bot',
-        text: `Welcome! I am your RAG Assistant grounded on the AI4Bharat MSMARCO-XI dataset.\n\nYou can ask questions via typing or clicking the Microphone button to use Voice Input. All answers are grounded in retrieved passages with verifiable citations.`,
+        text: `Aloha! Welcome to the HH-GOA Voice RAG System grounded on AI4Bharat MSMARCO-XI dataset.\n\nTap the Big Microphone button above to ask questions using your voice, or select a sample query below!`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         ragOutput: {
-          answer: `Welcome! I am your RAG Assistant grounded on the AI4Bharat MSMARCO-XI dataset.`,
+          answer: `Welcome to the HH-GOA Voice RAG System grounded on AI4Bharat MSMARCO-XI dataset.`,
           confidence: 1.0,
           citations: [
             {
@@ -57,7 +55,7 @@ export function App() {
               similarityScore: 0.99,
             },
           ],
-          reasoningSteps: ['Vector index loaded with 10 dataset passages across English & Indic languages'],
+          reasoningSteps: ['HH-GOA RAG Engine initialized with 10 dataset passages'],
           refused: false,
           toolCallsExecuted: [],
           stageTimingsMs: { stt: 0, preGuardrail: 0, vectorRetrieval: 0, toolOrchestration: 0, modelInference: 0, postGuardrail: 0, totalPipeline: 0 },
@@ -71,7 +69,6 @@ export function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  // Stop TTS if user leaves or unmounts
   useEffect(() => {
     return () => {
       TextToSpeechService.stop();
@@ -81,7 +78,6 @@ export function App() {
   const handleSendMessage = async (queryText: string, isVoiceInput: boolean = false) => {
     if (!queryText.trim() || isLoading) return;
 
-    // Stop ongoing speech when new query is submitted
     TextToSpeechService.stop();
     setCurrentlySpeakingId(null);
 
@@ -109,7 +105,6 @@ export function App() {
     setIsLoading(true);
 
     try {
-      // Execute End-to-End RAG Harness
       const output = await harness.executePipeline(queryText, 0, 3);
 
       const botMsgId = `bot-${Date.now()}`;
@@ -126,7 +121,6 @@ export function App() {
 
       setMessages((prev) => prev.map((m) => (m.id === loadingMsgId ? finalBotMsg : m)));
 
-      // Auto play TTS for voice queries or assistant answers
       if (isVoiceInput && !output.refused && output.answer) {
         setCurrentlySpeakingId(botMsgId);
         TextToSpeechService.speak(output.answer, () => {
@@ -134,14 +128,14 @@ export function App() {
         });
       }
     } catch (err: any) {
-      console.error('RAG Pipeline execution error:', err);
+      console.error('RAG Pipeline error:', err);
       const botMsgId = `bot-err-${Date.now()}`;
       const botTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       const errorBotMsg: ChatMessageItem = {
         id: botMsgId,
         sender: 'bot',
-        text: `Sorry, an error occurred while executing the RAG pipeline: ${err.message || err}`,
+        text: `Sorry, an error occurred in the RAG pipeline: ${err.message || err}`,
         timestamp: botTimestamp,
         isLoading: false,
       };
@@ -172,8 +166,8 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-dark-900 text-gray-100 selection:bg-indigo-500/30">
-      {/* Top Navigation Header */}
+    <div className="min-h-screen flex flex-col font-sans bg-dark-900 text-gray-100 selection:bg-cyan-500/30">
+      {/* Top Header */}
       <ChatHeader
         onClearChat={handleClearChat}
         onOpenDatasetDrawer={() => setIsDatasetDrawerOpen(true)}
@@ -181,22 +175,20 @@ export function App() {
         messageCount={messages.length}
       />
 
-      {/* Main Chat Conversation Container */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6 flex flex-col justify-between overflow-hidden">
-        {/* Messages Feed */}
-        <div className="flex-1 overflow-y-auto pr-1 space-y-4 min-h-[50vh]">
-          {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8 space-y-4 my-auto">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-2xl shadow-indigo-500/30">
-                <Bot className="w-8 h-8" />
-              </div>
-              <h2 className="text-xl font-bold text-white">Ask Anything on MSMARCO-XI Dataset</h2>
-              <p className="text-xs text-gray-400 max-w-md leading-relaxed">
-                Type a question or press the <strong className="text-indigo-300">Microphone button</strong> to speak. Questions are processed via vector retrieval and grounded safety guardrails.
-              </p>
-            </div>
-          ) : (
-            messages.map((msg) => (
+      {/* Main Screen Container */}
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-4 flex flex-col justify-start space-y-6">
+        {/* HERO CENTERPIECE: Big Microphone Orb in middle of screen */}
+        <HeroVoiceMic onSendMessage={handleSendMessage} isLoading={isLoading} />
+
+        {/* Conversation Feed */}
+        <div className="w-full space-y-4 pt-2 border-t border-cyan-500/20">
+          <div className="flex items-center justify-between px-2 text-xs text-gray-400 font-medium">
+            <span>RAG Answers & Citations</span>
+            <span>{messages.length} messages</span>
+          </div>
+
+          <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
+            {messages.map((msg) => (
               <ChatMessage
                 key={msg.id}
                 message={msg}
@@ -204,19 +196,13 @@ export function App() {
                 onStartSpeak={handleStartSpeak}
                 onStopSpeak={handleStopSpeak}
               />
-            ))
-          )}
-
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Bottom Input Dock */}
-        <div className="pt-4 border-t border-gray-800/80 mt-2">
-          <VoiceChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       </main>
 
-      {/* Slide-out MSMARCO-XI Dataset Explorer Drawer */}
+      {/* Slide-out Dataset Explorer Drawer */}
       <DatasetInspectorDrawer
         isOpen={isDatasetDrawerOpen}
         onClose={() => setIsDatasetDrawerOpen(false)}
