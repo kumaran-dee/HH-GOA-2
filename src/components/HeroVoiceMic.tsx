@@ -88,7 +88,7 @@ export const HeroVoiceMic: React.FC<HeroVoiceMicProps> = ({
   }, []);
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-2 space-y-2">
+    <div className="w-full max-w-2xl mx-auto px-4 py-2 space-y-3">
       {/* Sample Question Chips Bar */}
       <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
         {SAMPLE_QUERIES.slice(0, 5).map((sample) => (
@@ -103,56 +103,73 @@ export const HeroVoiceMic: React.FC<HeroVoiceMicProps> = ({
         ))}
       </div>
 
-      {/* Interim Voice Preview */}
+      {/* Live Voice Interim Transcript Display */}
       {isRecording && (
         <div className="text-xs text-center text-cyan-300 font-mono italic animate-pulse py-1">
-          🎙️ "{voiceInterimText || `Listening (${recordingSeconds}s)...`}"
+          🎙️ Listening ({recordingSeconds}s)... "{voiceInterimText || 'Speak into your microphone...'}"
         </div>
       )}
 
-      {/* Chatbot Prompt Bar with Embedded Big Mic */}
-      <form onSubmit={handleSubmit} className="relative flex items-center">
-        <div className="relative w-full glass-panel rounded-2xl border border-white/10 focus-within:border-cyan-500/50 shadow-2xl flex items-center p-1.5 space-x-2">
-          {/* Big Voice Mic Orb Button */}
+      {/* Main Input Area with BIG VOICE BUTTON */}
+      <div className="flex items-center space-x-3">
+        {/* PROMINENT BIG VOICE BUTTON */}
+        <div className="relative shrink-0">
+          {isRecording && (
+            <>
+              <span className="absolute -inset-2 rounded-full bg-rose-500/30 animate-ping"></span>
+              <span className="absolute -inset-4 rounded-full bg-rose-500/15 animate-pulse"></span>
+            </>
+          )}
+
           <button
             type="button"
             onClick={handleToggleVoice}
             disabled={isLoading}
-            className={`relative shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 shadow-md ${
+            className={`relative z-10 w-16 h-16 sm:w-18 sm:h-18 rounded-full flex flex-col items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-xl border-2 ${
               isRecording
-                ? 'bg-rose-500 text-white animate-pulse shadow-rose-500/50'
-                : 'bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-500 text-white shadow-cyan-500/30 hover:scale-105'
+                ? 'bg-gradient-to-tr from-rose-600 via-pink-600 to-amber-500 border-rose-300/50 text-white shadow-rose-500/50 animate-pulse'
+                : 'bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-500 border-cyan-300/40 text-white shadow-cyan-500/40 hover:border-cyan-200'
             }`}
-            title={isRecording ? 'Stop Recording' : 'Speak Question'}
+            title={isRecording ? 'Stop Voice Recording' : 'Push to Speak (Voice Input)'}
           >
-            {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-          </button>
-
-          {/* Text Input Field */}
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Ask a question or speak..."
-            disabled={isLoading}
-            className="flex-1 py-2 px-2 bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none"
-          />
-
-          {/* Send Button */}
-          <button
-            type="submit"
-            disabled={!inputText.trim() || isLoading}
-            className={`p-2.5 rounded-xl transition ${
-              !inputText.trim() || isLoading
-                ? 'text-gray-600 cursor-not-allowed'
-                : 'bg-cyan-500 hover:bg-cyan-400 text-dark-950 font-bold shadow-md shadow-cyan-500/20'
-            }`}
-            title="Send Message"
-          >
-            <Send className="w-4 h-4" />
+            {isRecording ? (
+              <MicOff className="w-8 h-8 sm:w-9 sm:h-9 text-white animate-bounce" />
+            ) : (
+              <Mic className="w-8 h-8 sm:w-9 sm:h-9 text-white drop-shadow-md" />
+            )}
+            <span className="text-[9px] font-extrabold uppercase tracking-wider text-white/90 -mt-0.5">
+              {isRecording ? `${recordingSeconds}s` : 'Voice'}
+            </span>
           </button>
         </div>
-      </form>
+
+        {/* Text Input Dock beside the Big Mic Button */}
+        <form onSubmit={handleSubmit} className="flex-1">
+          <div className="relative glass-panel rounded-2xl border border-white/10 focus-within:border-cyan-500/50 shadow-2xl flex items-center p-2">
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Or type a question here..."
+              disabled={isLoading}
+              className="w-full py-2 px-3 bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none"
+            />
+
+            <button
+              type="submit"
+              disabled={!inputText.trim() || isLoading}
+              className={`p-2.5 rounded-xl transition shrink-0 ${
+                !inputText.trim() || isLoading
+                  ? 'text-gray-600 cursor-not-allowed'
+                  : 'bg-cyan-500 hover:bg-cyan-400 text-dark-950 font-bold shadow-md shadow-cyan-500/20'
+              }`}
+              title="Send Message"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
