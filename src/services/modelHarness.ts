@@ -55,12 +55,12 @@ export class ModelHarness {
   }
 
   /**
-   * Check for natural conversational intents (Greetings, Farewells, Gratitude, Identity)
+   * Determine intent type and handle non-retrieval conversational requests
    */
   private checkConversationalIntent(query: string): string | null {
-    const q = query.toLowerCase().trim().replace(/[^\w\s]/g, '');
+    const q = query.toLowerCase().trim().replace(/[^\w\s\?]/g, '');
 
-    // Greetings
+    // Intent Type 1: Greetings
     if (/^(hi|hello|hey|hii|hey there|greetings|namaste|good morning|good afternoon|good evening)$/.test(q)) {
       if (q === 'hii') {
         return "Hi! What would you like to know or discuss?";
@@ -68,19 +68,26 @@ export class ModelHarness {
       return "Hello! How can I help you today?";
     }
 
-    // Farewells
-    if (/^(exit|bye|goodbye|see ya|quit|close|cya|bye bye)$/.test(q)) {
+    // Intent Type 2: Small Talk
+    if (/^(who are you|who are u|how are you|how are u|how are you doing|tell me a joke|joke|thank you|thanks|thx|thank u|appreciate it|exit|bye|goodbye)$/.test(q)) {
+      if (q.includes('who are you') || q.includes('who are u')) {
+        return "I am Antigravity, a professional AI assistant designed for both voice and text conversations. I combine natural conversation with Retrieval-Augmented Generation (RAG) to provide accurate, grounded answers!";
+      }
+      if (q.includes('how are you') || q.includes('how are u')) {
+        return "I'm doing great, thank you for asking! How can I assist you today?";
+      }
+      if (q.includes('joke')) {
+        return "Why don't scientists trust atoms? Because they make up everything!";
+      }
+      if (q.includes('thanks') || q.includes('thank')) {
+        return "You're very welcome! Let me know if you have any other questions.";
+      }
       return "Goodbye! Have a wonderful day ahead. Feel free to come back whenever you have questions.";
     }
 
-    // Gratitude
-    if (/^(thanks|thank you|thx|thank u|appreciate it|great thanks)$/.test(q)) {
-      return "You're very welcome! Let me know if you have any other questions.";
-    }
-
-    // Identity / Capabilities
-    if (/^(who are you|what can you do|what is this|help|info|capabilities|who made you)$/.test(q)) {
-      return "I am Antigravity, a professional AI assistant designed for both voice and text conversations. I combine natural conversation with Retrieval-Augmented Generation (RAG) to provide accurate, grounded answers!";
+    // Intent Type 6: Memory Questions
+    if (/^(what did i ask earlier|what was my last question|what did i say|what is my name|whats my name)$/.test(q)) {
+      return "I keep track of our conversation context! If you'd like me to summarize our previous discussion or recall specific details, just let me know.";
     }
 
     return null;
@@ -242,6 +249,15 @@ export class ModelHarness {
   private async executeFallbackSearch(query: string, topK: number): Promise<SearchResult[]> {
     const qLower = query.toLowerCase();
     
+    if (qLower.includes('check-in') || qLower.includes('checkin') || qLower.includes('check out') || qLower.includes('timing')) {
+      return this.vectorDb.search('HH Goa Check-in & Check-out Policy', topK);
+    }
+    if (qLower.includes('activity') || qLower.includes('water sport') || qLower.includes('kayak') || qLower.includes('yoga') || qLower.includes('cruise')) {
+      return this.vectorDb.search('HH Goa Guest Activities & Water Sports', topK);
+    }
+    if (qLower.includes('facility') || qLower.includes('amenities') || qLower.includes('resort') || qLower.includes('hh goa') || qLower.includes('goa')) {
+      return this.vectorDb.search('HH Goa Resort Overview & Facilities', topK);
+    }
     if (qLower.includes('transformer') || qLower.includes('ai') || qLower.includes('model') || qLower.includes('deep learning')) {
       return this.vectorDb.search('Transformer Architecture in Deep Learning', topK);
     }

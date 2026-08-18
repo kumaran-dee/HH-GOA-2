@@ -163,10 +163,73 @@ export const INITIAL_MSMARCO_DATASET: MSMARCOPassage[] = [
       passageId: "p110",
       targetQuery: "சூரிய சக்தி எவ்வாறு மின்சாரத்தை உருவாக்குகிறது?"
     }
+  },
+  {
+    id: "msmarco-p111",
+    title: "HH Goa Resort Overview & Facilities",
+    text: "HH Goa is a premier luxury beachfront resort located in North Goa along the Arabian Sea coastline. The resort features 120 ocean-view suites, a temperature-controlled infinity swimming pool, a full-service Ayurveda wellness spa, direct private beach access, a multi-cuisine seaside restaurant ('Aura'), complimentary high-speed Wi-Fi throughout the property, and 24/7 personalized concierge services.",
+    language: "en",
+    languageName: "English",
+    category: "HH Goa Knowledge",
+    metadata: {
+      domain: "Hospitality & Tourism",
+      sectionHeader: "Resort Facilities & Amenities",
+      passageId: "p111",
+      targetQuery: "Tell me about HH Goa and its facilities."
+    }
+  },
+  {
+    id: "msmarco-p112",
+    title: "HH Goa Check-in & Check-out Policy",
+    text: "At HH Goa, standard Check-in time begins at 2:00 PM (14:00 hrs) and standard Check-out time is until 11:00 AM (11:00 hrs). Express check-in is available via mobile app. Early check-in or late check-out requests can be accommodated based on room availability and may incur nominal charges. A valid government photo ID is required upon check-in.",
+    language: "en",
+    languageName: "English",
+    category: "HH Goa Knowledge",
+    metadata: {
+      domain: "Hospitality & Tourism",
+      sectionHeader: "Check-in Timings & Rules",
+      passageId: "p112",
+      targetQuery: "What are check-in and check-out timings at HH Goa?"
+    }
+  },
+  {
+    id: "msmarco-p113",
+    title: "HH Goa Guest Activities & Water Sports",
+    text: "HH Goa offers a diverse array of recreational activities for guests of all ages. Water sports include guided kayaking, jet skiing, banana boat rides, and parasailing organized by certified beach instructors. Onsite activities feature daily morning beachfront yoga sessions, beach volleyball tournaments, cooking masterclasses with head chefs, and evening catamaran sunset cruises along the Goa coastline.",
+    language: "en",
+    languageName: "English",
+    category: "HH Goa Knowledge",
+    metadata: {
+      domain: "Hospitality & Tourism",
+      sectionHeader: "Activities & Entertainment",
+      passageId: "p113",
+      targetQuery: "What activities are available at HH Goa?"
+    }
   }
 ];
 
 export const SAMPLE_QUERIES: SampleQuery[] = [
+  {
+    id: "hh1",
+    query: "What activities are available at HH Goa?",
+    category: "HH Goa Knowledge",
+    language: "en",
+    expectedPassageId: "msmarco-p113"
+  },
+  {
+    id: "hh2",
+    query: "What are check-in timings at HH Goa?",
+    category: "HH Goa Knowledge",
+    language: "en",
+    expectedPassageId: "msmarco-p112"
+  },
+  {
+    id: "hh3",
+    query: "Tell me about HH Goa facilities.",
+    category: "HH Goa Knowledge",
+    language: "en",
+    expectedPassageId: "msmarco-p111"
+  },
   {
     id: "q1",
     query: "What is the Transformer architecture in deep learning?",
@@ -225,4 +288,5 @@ export const SAMPLE_QUERIES: SampleQuery[] = [
     isOffTopic: true
   }
 ];
+
 
