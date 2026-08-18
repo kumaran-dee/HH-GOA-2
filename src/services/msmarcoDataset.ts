@@ -163,10 +163,31 @@ export const INITIAL_MSMARCO_DATASET: MSMARCOPassage[] = [
       passageId: "p110",
       targetQuery: "சூரிய சக்தி எவ்வாறு மின்சாரத்தை உருவாக்குகிறது?"
     }
+  },
+  {
+    id: "msmarco-p111",
+    title: "Antigravity Research Scenario & Spacetime Metric Engineering Proposal",
+    text: "# Antigravity Research Scenario: Technical Research Proposal\n\n1. **Theory**: Reactionless gravitational lift operates via localized spacetime metric engineering using Einstein Field Equations (G_mu_nu + Lambda g_mu_nu = 8pi G / c^4 T_mu_nu). By creating a metric expansion below the craft (theta > 0) and metric contraction above (theta < 0), the vehicle sits in a locally flat spacetime bubble that accelerates along the engineered metric gradient. Exotic stress-energy tensors (T_00 < 0) violating the Null Energy Condition (NEC) are generated via quantum vacuum squeezed states and Casimir effect micro-cavity arrays.\n\n2. **System Architecture**: Key components include Dynamic Casimir Vacuum Squeezer Arrays (DCVSA) made of topological insulator metamaterials (Bi2Se3/Graphene), 30-45 Tesla REBCO High-Temperature Superconducting (HTS) magnetic coils for field confinement, a Gravito-Inertial Vector Controller (GIVC), and a superfluid Helium (2.17 K) CNT-Titanium cryogenic containment hull.\n\n3. **Energy Source & Requirements**: Sustained flight requires ~100 MW continuous electrical power with 1 TW peak pulses, supplied by an aneutronic Direct Energy Conversion Fusion Reactor (D-3He or p-11B). Lift satisfies energy conservation as reactor energy equals potential energy gain (m*g*h) plus quantum dissipation.\n\n4. **Operational Process**: Flight progresses from cryo-cooling initialization, vacuum state squeezing (femtosecond laser pumping at 10^14 Hz), metric gradient ascent (zero internal g-force freefall), to vector-controlled hover.\n\n5. **Challenges & Safety Risks**: Constraints include Ford-Roman quantum inequalities limiting negative energy duration, dielectric micro-cavity breakdown, risks of high-energy gamma photon flash during decoherence, and intense induced EMP.\n\n6. **Science vs Speculation vs Fiction**: Established science includes General Relativity geodesics and Casimir vacuum energy; speculative theory includes metamaterial vacuum squeezing and sub-Planckian thin-shell metrics; science fiction includes gravity-blocking shields ('Cavorite') and zero-energy inertia dampeners.\n\n7. **Future Research & Feasibility**: Physical viability is 7/10 (permitted under GR/QFT), engineering feasibility 3/10 (requires metamaterial/fusion breakthroughs), overall feasibility 4/10.",
+    language: "en",
+    languageName: "English",
+    category: "Theoretical Physics",
+    metadata: {
+      domain: "Gravitational Physics",
+      sectionHeader: "Technical Research Proposal",
+      passageId: "p111",
+      targetQuery: "Design a scientifically plausible antigravity system (Antigravity Research Scenario)"
+    }
   }
 ];
 
 export const SAMPLE_QUERIES: SampleQuery[] = [
+  {
+    id: "q8",
+    query: "Antigravity Research Proposal: Design a plausible antigravity system",
+    category: "Theoretical Physics",
+    language: "en",
+    expectedPassageId: "msmarco-p111"
+  },
   {
     id: "q1",
     query: "What is the Transformer architecture in deep learning?",
@@ -225,3 +246,4 @@ export const SAMPLE_QUERIES: SampleQuery[] = [
     isOffTopic: true
   }
 ];
+
