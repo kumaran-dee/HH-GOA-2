@@ -75,7 +75,7 @@ export function App() {
     setIsLoading(true);
 
     try {
-      const output = await harness.executePipeline(queryText, 0, 3);
+      const output = await harness.executePipeline(queryText, 0, 3, undefined, messages);
 
       const botMsgId = `bot-${Date.now()}`;
       const botTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
