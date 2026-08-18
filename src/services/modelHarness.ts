@@ -1,5 +1,6 @@
 import { VectorDbEngine, type SearchResult } from './vectorDb';
 import { GuardrailSuite } from './guardrails';
+import { ANTIGRAVITY_SYSTEM_PROMPT } from './systemPrompt';
 
 export type PipelineStage =
   | 'IDLE'
@@ -47,6 +48,7 @@ export interface StructuredRAGOutput {
 export class ModelHarness {
   private vectorDb: VectorDbEngine;
   private maxRetries: number = 3;
+  public readonly systemPrompt: string = ANTIGRAVITY_SYSTEM_PROMPT;
 
   constructor(vectorDb: VectorDbEngine) {
     this.vectorDb = vectorDb;
@@ -59,8 +61,11 @@ export class ModelHarness {
     const q = query.toLowerCase().trim().replace(/[^\w\s]/g, '');
 
     // Greetings
-    if (/^(hi|hello|hey|hey there|greetings|namaste|good morning|good afternoon|good evening)$/.test(q)) {
-      return "Hello! How can I help you today? Feel free to ask any question about Artificial Intelligence, Quantum Computing, Healthcare, Clean Energy, Economics, or Indic NLP.";
+    if (/^(hi|hello|hey|hii|hey there|greetings|namaste|good morning|good afternoon|good evening)$/.test(q)) {
+      if (q === 'hii') {
+        return "Hi! What would you like to know or discuss?";
+      }
+      return "Hello! How can I help you today?";
     }
 
     // Farewells
@@ -75,7 +80,7 @@ export class ModelHarness {
 
     // Identity / Capabilities
     if (/^(who are you|what can you do|what is this|help|info|capabilities|who made you)$/.test(q)) {
-      return "I am the HH-GOA Voice RAG Assistant grounded on the AI4Bharat MSMARCO-XI dataset. You can speak using the Big Voice button or type any question to get verifiable answers with dataset citations!";
+      return "I am Antigravity, a professional AI assistant designed for both voice and text conversations. I combine natural conversation with Retrieval-Augmented Generation (RAG) to provide accurate, grounded answers!";
     }
 
     return null;
@@ -260,7 +265,7 @@ export class ModelHarness {
 
     if (results.length === 0) {
       return {
-        answer: `I am grounded on the MSMARCO-XI dataset covering AI, Quantum Computing, Healthcare, Energy, and Economics. Please ask a question related to these topics!`,
+        answer: "I couldn't find enough information in the available knowledge sources to answer that confidently.",
         citations: [],
       };
     }
