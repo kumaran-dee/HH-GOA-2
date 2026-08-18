@@ -80,18 +80,53 @@ export class GuardrailSuite {
   }
 
   /**
-   * 2. Relevance thresholding on retrieved context chunks
+   * 2. Relevance thresholding & Subject Verification on retrieved context chunks
    */
-  public static checkContextRelevance(results: SearchResult[], threshold: number = 0.25): GuardrailCheckResult {
+  public static checkContextRelevance(
+    query: string,
+    results: SearchResult[],
+    threshold: number = 0.20
+  ): GuardrailCheckResult {
     const startTime = performance.now();
-    if (results.length === 0 || results[0].score < threshold) {
-      const topScore = results.length > 0 ? results[0].score : 0;
+
+    if (results.length === 0) {
       const endTime = performance.now();
       return {
         passed: false,
         stage: 'RELEVANCE_CHECK',
-        reason: `Insufficient dataset context (Top score ${topScore.toFixed(2)} < threshold ${threshold}). Refusing to answer to prevent hallucination.`,
-        score: topScore,
+        reason: "I couldn't find relevant information to answer that question.",
+        score: 0,
+        isOffTopic: true,
+        isPromptInjection: false,
+        isGrounded: false,
+        latencyMs: Number((endTime - startTime).toFixed(3)),
+      };
+    }
+
+    const topResult = results[0];
+    const topScore = topResult.score;
+
+    // Self-Check Verification: Does the retrieved context mention the main subject of the question?
+    const stopWords = new Set(['what', 'is', 'the', 'how', 'do', 'where', 'can', 'you', 'give', 'me', 'a', 'an', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'about', 'does', 'did', 'was', 'were', 'tell', 'explain']);
+    const queryWords = query.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
+
+    const contextText = (topResult.chunk.metadata.title + ' ' + topResult.chunk.text).toLowerCase();
+
+    let matchedTerms = 0;
+    queryWords.forEach(w => {
+      if (contextText.includes(w)) matchedTerms++;
+    });
+
+    const hasSubjectOverlap = queryWords.length === 0 || matchedTerms > 0;
+
+    // Reject retrieval if similarity is low or query subject is entirely absent from retrieved document (e.g. Manhattan Project vs Inflation)
+    if (topScore < threshold || !hasSubjectOverlap) {
+      const endTime = performance.now();
+      return {
+        passed: false,
+        stage: 'RELEVANCE_CHECK',
+        reason: "I couldn't find relevant information to answer that question.",
+        score: Number(topScore.toFixed(3)),
         isOffTopic: true,
         isPromptInjection: false,
         isGrounded: false,
@@ -103,7 +138,7 @@ export class GuardrailSuite {
     return {
       passed: true,
       stage: 'RELEVANCE_CHECK',
-      score: results[0].score,
+      score: topScore,
       isOffTopic: false,
       isPromptInjection: false,
       isGrounded: true,

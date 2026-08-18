@@ -173,6 +173,34 @@ export class ModelHarness {
 
     const toolTime = performance.now() - toolStart;
 
+    // Stage 2.5: Retrieval Validation & Subject Relevance Self-Check
+    const relevanceCheck = GuardrailSuite.checkContextRelevance(queryText, searchResults);
+    if (!relevanceCheck.passed) {
+      onStateChange?.('REFUSED', relevanceCheck.reason);
+      const totalTime = performance.now() - totalStartTime;
+      return {
+        answer: "I couldn't find relevant information to answer that question.",
+        confidence: 0,
+        citations: [],
+        reasoningSteps: [
+          `Retrieval Validation failed: Subject mismatch or low relevance score (${relevanceCheck.score})`,
+          `Applied self-check rule: Refused answer generation on unsupported subject`
+        ],
+        refused: true,
+        refusalReason: relevanceCheck.reason,
+        toolCallsExecuted,
+        stageTimingsMs: {
+          stt: sttLatencyMs,
+          preGuardrail: Number(preCheckTime.toFixed(2)),
+          vectorRetrieval: Number(retrievalTime.toFixed(2)),
+          toolOrchestration: Number(toolTime.toFixed(2)),
+          modelInference: 0,
+          postGuardrail: 0,
+          totalPipeline: Number(totalTime.toFixed(2)),
+        },
+      };
+    }
+
     // Stage 3: Model Inference / Synthesis
     onStateChange?.('MODEL_INFERENCE', 'Synthesizing answer from dataset passages');
     const inferenceStart = performance.now();
@@ -265,7 +293,7 @@ export class ModelHarness {
 
     if (results.length === 0) {
       return {
-        answer: "I couldn't find enough information in the available knowledge sources to answer that confidently.",
+        answer: "I couldn't find relevant information to answer that question.",
         citations: [],
       };
     }
