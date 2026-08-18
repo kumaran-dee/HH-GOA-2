@@ -242,9 +242,6 @@ export class ModelHarness {
   private async executeFallbackSearch(query: string, topK: number): Promise<SearchResult[]> {
     const qLower = query.toLowerCase();
     
-    if (qLower.includes('antigravity') || qLower.includes('gravity') || qLower.includes('metric') || qLower.includes('spacetime') || qLower.includes('physic')) {
-      return this.vectorDb.search('Antigravity Research Scenario & Spacetime Metric Engineering Proposal', topK);
-    }
     if (qLower.includes('transformer') || qLower.includes('ai') || qLower.includes('model') || qLower.includes('deep learning')) {
       return this.vectorDb.search('Transformer Architecture in Deep Learning', topK);
     }
