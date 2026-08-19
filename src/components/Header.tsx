@@ -7,6 +7,7 @@ interface HeaderProps {
   setActiveTab: (tab: 'rag' | 'chunking' | 'harness' | 'analytics') => void;
   sttProvider: STTProvider;
   onOpenSettings: () => void;
+  onOpenDatasetDrawer: () => void;
   datasetCount: number;
 }
 
@@ -15,6 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   sttProvider,
   onOpenSettings,
+  onOpenDatasetDrawer,
   datasetCount,
 }) => {
   return (
@@ -97,10 +99,14 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* System Badges & Controls */}
         <div className="flex items-center space-x-3">
-          <div className="hidden lg:flex items-center space-x-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
+          <button
+            onClick={onOpenDatasetDrawer}
+            className="hidden lg:flex items-center space-x-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
+            title="Inspect AI4Bharat MSMARCO-XI dataset passages"
+          >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>{datasetCount} Passages Ready</span>
-          </div>
+            <span>{datasetCount} Passages</span>
+          </button>
 
           <div className="text-xs px-2.5 py-1 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-200 uppercase font-mono tracking-wider">
             STT: {sttProvider}

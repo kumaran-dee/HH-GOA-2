@@ -221,4 +221,12 @@ export class VectorDbEngine {
   public getStats(): VectorDbIndexStats {
     return this.buildStats;
   }
+
+  public getChunksCount(): number {
+    return this.chunks.length;
+  }
+
+  public getChunks(): Chunk[] {
+    return this.chunks;
+  }
 }
