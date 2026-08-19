@@ -13,20 +13,24 @@ export const DatasetInspectorDrawer: React.FC<DatasetInspectorDrawerProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('ALL');
 
   if (!isOpen) return null;
 
   const categories = ['ALL', ...Array.from(new Set(INITIAL_MSMARCO_DATASET.map((p) => p.category)))];
+  const languages = ['ALL', ...Array.from(new Set(INITIAL_MSMARCO_DATASET.map((p) => p.languageName)))];
 
   const filteredPassages = INITIAL_MSMARCO_DATASET.filter((passage) => {
     const matchesSearch =
       passage.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       passage.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      passage.metadata.domain.toLowerCase().includes(searchTerm.toLowerCase());
+      passage.metadata.domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      passage.languageName.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesCategory = selectedCategory === 'ALL' || passage.category === selectedCategory;
+    const matchesLanguage = selectedLanguage === 'ALL' || passage.languageName === selectedLanguage;
 
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && matchesLanguage;
   });
 
   return (
@@ -44,7 +48,7 @@ export const DatasetInspectorDrawer: React.FC<DatasetInspectorDrawerProps> = ({
                   MSMARCO-XI Vector Index
                 </h2>
                 <p className="text-xs text-gray-400">
-                  {INITIAL_MSMARCO_DATASET.length} Indexed Passages from AI4Bharat MSMARCO-XI
+                  {INITIAL_MSMARCO_DATASET.length} Passages across 11 Indian Languages + English
                 </p>
               </div>
             </div>
@@ -67,9 +71,29 @@ export const DatasetInspectorDrawer: React.FC<DatasetInspectorDrawerProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search indexed passages or domains..."
+                placeholder="Search passages, languages (Hindi, Tamil, Telugu...), or domains..."
                 className="w-full pl-9 pr-4 py-2 bg-dark-800 border border-gray-700/80 rounded-xl text-xs text-gray-100 placeholder-gray-400 focus:outline-none focus:border-indigo-500"
               />
+            </div>
+
+            {/* Language Filter Chips */}
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Filter by Language (11 Indic + Eng):</span>
+              <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 no-scrollbar">
+                {languages.map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => setSelectedLanguage(lang)}
+                    className={`shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition ${
+                      selectedLanguage === lang
+                        ? 'bg-cyan-600 text-white'
+                        : 'bg-dark-800 text-gray-400 hover:text-gray-200 border border-gray-800'
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Category Filter Chips */}
